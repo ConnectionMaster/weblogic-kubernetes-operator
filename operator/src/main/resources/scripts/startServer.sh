@@ -181,9 +181,7 @@ function prepareMIIServer() {
   fi
 
   trace "Model-in-Image: Restoring primordial domain"
-  cd / || return 1
-  base64 -d /weblogic-operator/introspector/primordial_domainzip.secure > /tmp/domain.tar.gz || return 1
-  tar -xzf /tmp/domain.tar.gz || return 1
+  restorePrimordialDomain || return 1
 
   trace "Model-in-Image: Restore domain secret"
   # decrypt the SerializedSystemIni first
@@ -199,10 +197,7 @@ function prepareMIIServer() {
   # restore the config zip
   #
   trace "Model-in-Image: Restore domain config"
-  cd / || return 1
-  base64 -d /weblogic-operator/introspector/domainzip.secure > /tmp/domain.tar.gz || return 1
-  tar -xzf /tmp/domain.tar.gz || return 1
-  chmod +x ${DOMAIN_HOME}/bin/*.sh ${DOMAIN_HOME}/*.sh  || return 1
+  restoreDomainConfig || return 1
 
   # restore the archive apps and libraries
   #
