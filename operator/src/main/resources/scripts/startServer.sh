@@ -8,11 +8,7 @@
 # This is the script WebLogic Operator WLS Pods use to start their WL Server.
 #
 
-if [ -z ${SCRIPTPATH+x} ]; then
-  SCRIPTPATH="$( cd "$(dirname "$0")" > /dev/null 2>&1 ; pwd -P )"
-fi
-
-echo "script path is ${SCRIPTPATH}"
+SCRIPTPATH="$( cd "$(dirname "$0")" > /dev/null 2>&1 ; pwd -P )"
 source ${SCRIPTPATH}/utils.sh
 [ $? -ne 0 ] && echo "[SEVERE] Missing file ${SCRIPTPATH}/utils.sh" && exitOrLoop
 
@@ -38,7 +34,7 @@ function copyIfChanged() {
     trace "Copying '$1' to '$2'."
     cp $1 $2
     [ $? -ne 0 ] && trace SEVERE "failed cp $1 $2" && exitOrLoop
-    chmod 750 $2 
+    chmod 750 $2
     [ $? -ne 0 ] && trace SEVERE "failed chmod 750 $2" && exitOrLoop
   else
     trace "Skipping copy of '$1' to '$2' -- these files already match."
@@ -75,7 +71,7 @@ function startWLS() {
   traceTiming "POD '${SERVICE_NAME}' MD5 END"
 
   #
-  # We "tail" the future WL Server .out file to stdout in background _before_ starting 
+  # We "tail" the future WL Server .out file to stdout in background _before_ starting
   # the WLS Server because we use WLST 'nmStart()' to start the server and nmStart doesn't return
   # control until WLS reaches the RUNNING state.
   #
@@ -133,7 +129,7 @@ function copySitCfgWhileBooting() {
   #
   # This method is called before the server boots, see
   # 'copySitCfgWhileRunning' in 'livenessProbe.sh' for a similar method that
-  # is called periodically while the server is running. 
+  # is called periodically while the server is running.
 
   src_dir=${1?}
   tgt_dir=${2?}
@@ -185,7 +181,9 @@ function prepareMIIServer() {
   fi
 
   trace "Model-in-Image: Restoring primordial domain"
-  restorePrimordialDomain || return 1
+  cd / || return 1
+  base64 -d /weblogic-operator/introspector/primordial_domainzip.secure > /tmp/domain.tar.gz || return 1
+  tar -xzf /tmp/domain.tar.gz || return 1
 
   trace "Model-in-Image: Restore domain secret"
   # decrypt the SerializedSystemIni first
@@ -201,7 +199,10 @@ function prepareMIIServer() {
   # restore the config zip
   #
   trace "Model-in-Image: Restore domain config"
-  restoreDomainConfig || return 1
+  cd / || return 1
+  base64 -d /weblogic-operator/introspector/domainzip.secure > /tmp/domain.tar.gz || return 1
+  tar -xzf /tmp/domain.tar.gz || return 1
+  chmod +x ${DOMAIN_HOME}/bin/*.sh ${DOMAIN_HOME}/*.sh  || return 1
 
   # restore the archive apps and libraries
   #
