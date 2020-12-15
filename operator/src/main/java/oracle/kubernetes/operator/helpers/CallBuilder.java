@@ -584,9 +584,25 @@ public class CallBuilder {
    * @throws ApiException API Exception
    */
   public VersionInfo readVersionCode() throws ApiException {
-    RequestParams requestParams = new RequestParams("getVersion", null, null, null, callParams);
-    return executeSynchronousCall(
-        requestParams, ((client, params) -> new VersionApi(client).getCode()));
+    int n = 0;
+    while (true) {
+      try {
+        RequestParams requestParams = new RequestParams("getVersion", null, null, null, callParams);
+        return executeSynchronousCall(
+            requestParams, ((client, params) -> new VersionApi(client).getCode()));
+      } catch (ApiException ex) {
+        n++;
+        if (n > 3) {
+          throw ex;
+        } else {
+          try {
+            Thread.sleep(5000);
+          } catch (InterruptedException ne) {
+            throw ex;
+          }
+        }
+      }
+    }
   }
 
   private <T> T executeSynchronousCall(
