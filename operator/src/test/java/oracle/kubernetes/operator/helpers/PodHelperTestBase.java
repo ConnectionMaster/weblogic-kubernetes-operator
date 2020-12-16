@@ -1183,7 +1183,7 @@ public abstract class PodHelperTestBase extends DomainValidationBaseTest {
 
   static V1EnvVar createFieldRefEnvVar(String name, String fieldPath) {
     return new V1EnvVar().name(name).valueFrom(
-        new V1EnvVarSource().fieldRef(new V1ObjectFieldSelector().fieldPath(fieldPath)));
+        new V1EnvVarSource().fieldRef(new V1ObjectFieldSelector().fieldPath(fieldPath).apiVersion("v1")));
   }
 
   static V1EnvVar createConfigMapKeyRefEnvVar(String name, String configMapName, String key) {

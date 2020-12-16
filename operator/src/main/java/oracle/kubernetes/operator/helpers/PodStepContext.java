@@ -302,6 +302,7 @@ public abstract class PodStepContext extends BasePodStepContext {
    * @return a step to be scheduled.
    */
   private Step deletePod(V1Pod pod, Step next) {
+    LOGGER.fine("DEBUG: delete pod" + pod);
     return new CallBuilder()
         .deletePodAsync(getPodName(), getNamespace(), getDomainUid(), new V1DeleteOptions(), deleteResponse(pod, next));
   }
@@ -431,6 +432,9 @@ public abstract class PodStepContext extends BasePodStepContext {
           MessageKeys.POD_DUMP,
           AnnotationHelper.getDebugString(currentPod),
           AnnotationHelper.getDebugString(getPodModel()));
+    } else {
+      LOGGER.fine("currentPod is " + currentPod + ", useCurrent is " + useCurrent + " and length is "
+          + AnnotationHelper.getDebugString(currentPod).length());
     }
 
     return useCurrent;
@@ -864,6 +868,7 @@ public abstract class PodStepContext extends BasePodStepContext {
             getReasonToRecycle(currentPod));
         return doNext(replaceCurrentPod(currentPod, getNext()), packet);
       } else if (mustPatchPod(currentPod)) {
+        LOGGER.fine("mustPatchPod returned true, patching the pod " + currentPod);
         return doNext(patchCurrentPod(currentPod, getNext()), packet);
       } else {
         logPodExists();
@@ -942,6 +947,9 @@ public abstract class PodStepContext extends BasePodStepContext {
 
     @Override
     public NextAction onSuccess(Packet packet, CallResponse<Object> callResponses) {
+      LOGGER.fine("DEBUG: callResponse.getResult() -> " + callResponses.getResult()
+              + " callResponses.getStatusCode() -> " + callResponses.getStatusCode()
+              + " callResponses.getExceptionString() -> " + callResponses.getExceptionString());
       PodAwaiterStepFactory pw = packet.getSpi(PodAwaiterStepFactory.class);
       return doNext(pw.waitForDelete(pod, replacePod(getNext())), packet);
     }
@@ -960,6 +968,9 @@ public abstract class PodStepContext extends BasePodStepContext {
 
     @Override
     public NextAction onSuccess(Packet packet, CallResponse<V1Pod> callResponse) {
+      LOGGER.fine("DEBUG: ReplacePodResponseStep.onSuccess.. callResponse " + callResponse.getResult()
+              + " , status code -> " + callResponse.getStatusCode()
+              + " , exception -> " + callResponse.getExceptionString());
       return doNext(
           packet.getSpi(PodAwaiterStepFactory.class).waitForReady(processResponse(callResponse), getNext()),
           packet);
@@ -984,6 +995,9 @@ public abstract class PodStepContext extends BasePodStepContext {
 
     protected V1Pod processResponse(CallResponse<V1Pod> callResponse) {
       V1Pod newPod = callResponse.getResult();
+      LOGGER.fine("DEBUG: PatchPodResponseStep.processResponse.. callResponse " + newPod
+              + " ,status code -> " + callResponse.getStatusCode()
+              + " , exception -> " + callResponse.getExceptionString());
       logPodChanged();
       if (newPod != null) {
         setRecordedPod(newPod);

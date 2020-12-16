@@ -348,6 +348,7 @@ public class PodWatcher extends Watcher<V1Pod> implements WatchListener<V1Pod>, 
     // A pod is considered deleted when reading its value from Kubernetes returns null.
     @Override
     protected boolean isReady(V1Pod result) {
+      LOGGER.fine("DEBUG: WaitForPodDeleteStep.isReady.. result " + result);
       return result == null;
     }
 

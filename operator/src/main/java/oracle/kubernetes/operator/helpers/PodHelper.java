@@ -410,6 +410,13 @@ public class PodHelper {
     @Override
     // let the pod rolling step update the pod
     Step replaceCurrentPod(V1Pod pod, Step next) {
+      if (pod != null) {
+        LOGGER.fine("DEBUG: replacing current pod, metadata -> " + pod.getMetadata()
+                + ", status -> " + pod.getStatus());
+      }
+      if (pod != null && pod.getMetadata() != null) {
+        LOGGER.fine("DEBUG: replacing current pod name -> " + pod.getMetadata().getName());
+      }
       return deferProcessing(createCyclePodStep(pod, next));
     }
 
