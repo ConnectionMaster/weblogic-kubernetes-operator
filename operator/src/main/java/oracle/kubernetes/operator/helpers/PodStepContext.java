@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.json.Json;
 import javax.json.JsonPatchBuilder;
 
@@ -70,6 +71,7 @@ public abstract class PodStepContext extends BasePodStepContext {
   private static final String LIVENESS_PROBE = "/weblogic-operator/scripts/livenessProbe.sh";
 
   private static final String READINESS_PATH = "/weblogic/ready";
+  private static AtomicInteger UNIQUE_ID = new AtomicInteger(0);
 
   final WlsServerConfig scan;
   private final WlsDomainConfig domainTopology;
@@ -927,10 +929,12 @@ public abstract class PodStepContext extends BasePodStepContext {
 
   private class DeleteResponseStep extends ResponseStep<Object> {
     private final V1Pod pod;
+    private final int id;
 
     DeleteResponseStep(V1Pod pod, Step next) {
       super(next);
       this.pod = pod;
+      id = UNIQUE_ID.incrementAndGet();
     }
 
     protected String getDetail() {
@@ -947,9 +951,12 @@ public abstract class PodStepContext extends BasePodStepContext {
 
     @Override
     public NextAction onSuccess(Packet packet, CallResponse<Object> callResponses) {
-      LOGGER.fine("DEBUG: callResponse.getResult() -> " + callResponses.getResult()
-              + " callResponses.getStatusCode() -> " + callResponses.getStatusCode()
-              + " callResponses.getExceptionString() -> " + callResponses.getExceptionString());
+      LOGGER.fine("DEBUG: DeleteResponseStep.onSuccess -> "
+              + " id " + id
+              + ", callResponse.getResult() -> " + callResponses.getResult()
+              + ", callResponses.getStatusCode() -> " + callResponses.getStatusCode()
+              + ", callResponses.getExceptionString() -> " + callResponses.getExceptionString()
+              + ", pod -> " + pod);
       PodAwaiterStepFactory pw = packet.getSpi(PodAwaiterStepFactory.class);
       return doNext(pw.waitForDelete(pod, replacePod(getNext())), packet);
     }
