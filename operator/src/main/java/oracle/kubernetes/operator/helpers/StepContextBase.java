@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.kubernetes.client.openapi.models.V1ObjectFieldSelector;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1OwnerReference;
 import io.kubernetes.client.openapi.models.V1Pod;
@@ -64,12 +63,6 @@ public abstract class StepContextBase implements StepContextConstants {
                         substitutionVariables,
                         item.getLeft().invoke(obj),
                         isDns1123Required(item.getLeft())));
-          }
-          if (subObj instanceof V1ObjectFieldSelector) {
-            V1ObjectFieldSelector fieldSelector = (V1ObjectFieldSelector) subObj;
-            if (fieldSelector.getApiVersion() == null) {
-              fieldSelector.setApiVersion("v1");
-            }
           }
           return subObj;
         } catch (NoSuchMethodException
