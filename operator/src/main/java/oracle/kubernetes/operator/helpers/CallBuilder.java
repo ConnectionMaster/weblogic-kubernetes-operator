@@ -596,7 +596,9 @@ public class CallBuilder {
           throw ex;
         } else {
           try {
-            Thread.sleep(5000);
+            if (ex.getCause() instanceof java.net.ConnectException) {
+              Thread.sleep(5000);
+            }
           } catch (InterruptedException ne) {
             throw ex;
           }
