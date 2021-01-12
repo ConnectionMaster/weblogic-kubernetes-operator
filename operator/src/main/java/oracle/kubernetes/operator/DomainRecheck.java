@@ -168,10 +168,12 @@ class DomainRecheck {
       List<Step> nextSteps = new ArrayList<>();
       if (!namespacesToStartNow.isEmpty()) {
         namespacesToStart.addAll(namespacesToStartNow);
+      }
+      if (!namespacesToStart.isEmpty()) {
         nextSteps.add(createStartNamespacesStep(namespacesToStart));
         if (Namespaces.getConfiguredDomainNamespaces() == null) {
           nextSteps.add(
-                RunInParallel.perNamespace(namespacesToStartNow, DomainRecheck.this::createNamespaceReview));
+                RunInParallel.perNamespace(namespacesToStart, DomainRecheck.this::createNamespaceReview));
         }
       }
       nextSteps.add(getNext());
