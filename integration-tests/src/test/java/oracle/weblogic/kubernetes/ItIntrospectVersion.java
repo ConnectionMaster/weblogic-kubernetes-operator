@@ -43,7 +43,6 @@ import oracle.weblogic.kubernetes.annotations.IntegrationTest;
 import oracle.weblogic.kubernetes.annotations.Namespaces;
 import oracle.weblogic.kubernetes.logging.LoggingFacade;
 import oracle.weblogic.kubernetes.utils.BuildApplication;
-import oracle.weblogic.kubernetes.utils.ExecResult;
 import oracle.weblogic.kubernetes.utils.OracleHttpClient;
 import org.awaitility.core.ConditionEvaluationListener;
 import org.awaitility.core.ConditionFactory;
@@ -115,7 +114,7 @@ import static oracle.weblogic.kubernetes.utils.CommonTestUtils.getPodsWithTimeSt
 import static oracle.weblogic.kubernetes.utils.CommonTestUtils.installAndVerifyNginx;
 import static oracle.weblogic.kubernetes.utils.CommonTestUtils.installAndVerifyOperator;
 import static oracle.weblogic.kubernetes.utils.CommonTestUtils.setPodAntiAffinity;
-import static oracle.weblogic.kubernetes.utils.DeployUtil.deployUsingRest;
+import static oracle.weblogic.kubernetes.utils.DeployUtil.deployUsingWlst;
 import static oracle.weblogic.kubernetes.utils.TestUtils.getNextFreePort;
 import static oracle.weblogic.kubernetes.utils.TestUtils.verifyServerCommunication;
 import static oracle.weblogic.kubernetes.utils.ThreadSafeLogger.getLogger;
@@ -377,15 +376,20 @@ public class ItIntrospectVersion {
     //deploy clusterview application
     logger.info("Deploying clusterview app {0} to cluster {1}",
         clusterViewAppPath, clusterName);
-    ExecResult result = null;
-    String targets = "{identity:[clusters,'mycluster']},{identity:[servers,'admin-server']}";
-    result = deployUsingRest(K8S_NODEPORT_HOST,
-        Integer.toString(serviceNodePort),
-        ADMIN_USERNAME_DEFAULT, ADMIN_PASSWORD_DEFAULT,
-        targets, clusterViewAppPath, null, "clusterview");
-    assertNotNull(result, "Application deployment failed");
-    logger.info("Application deployment returned {0}", result.toString());
-    assertEquals("202", result.stdout(), "Application deploymen failed with wrong HTTP status code");
+
+    deployUsingWlst(adminServerPodName, Integer.toString(defaultChannelPort),
+        ADMIN_USERNAME_DEFAULT, ADMIN_PASSWORD_DEFAULT, adminServerName + "," + clusterName, clusterViewAppPath,
+        introDomainNamespace);
+
+    //    ExecResult result = null;
+    //    String targets = "{identity:[clusters,'mycluster']},{identity:[servers,'admin-server']}";
+    //    result = deployUsingRest(K8S_NODEPORT_HOST,
+    //        Integer.toString(serviceNodePort),
+    //        ADMIN_USERNAME_DEFAULT, ADMIN_PASSWORD_DEFAULT,
+    //        targets, clusterViewAppPath, null, "clusterview");
+    //    assertNotNull(result, "Application deployment failed");
+    //    logger.info("Application deployment returned {0}", result.toString());
+    //    assertEquals("202", result.stdout(), "Application deploymen failed with wrong HTTP status code");
 
     List<String> managedServerNames = new ArrayList<String>();
     for (int i = 1; i <= replicaCount; i++) {
