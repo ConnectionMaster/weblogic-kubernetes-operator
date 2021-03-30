@@ -23,8 +23,8 @@ using the operator to deploy and run a WebLogic domain container-packaged web ap
 ***
 #### Current production release
 
-The [current release of the operator](https://github.com/oracle/weblogic-kubernetes-operator/releases) is 3.1.2.
-This release was published on January 22, 2021. See the operator prerequisites and supported environments [here]({{< relref "/userguide/introduction/introduction#operator-prerequisites" >}}).
+The [current release of the operator](https://github.com/oracle/weblogic-kubernetes-operator/releases) is 3.1.4.
+This release was published on March 1, 2021. See the operator prerequisites and supported environments [here]({{< relref "/userguide/introduction/introduction#operator-prerequisites" >}}).
 
 ***
 
@@ -90,6 +90,10 @@ Documentation for APIs:
 * See the [Swagger](https://oracle.github.io/weblogic-kubernetes-operator/swagger/index.html) documentation for the operator's REST interface.
 
 * See the [Javadoc](https://oracle.github.io/weblogic-kubernetes-operator/apidocs/index.html) for the operator.
+
+### Oracle support
+
+To access Oracle support for running WebLogic Server domains on Kubernetes platforms, see [WebLogic Server Certifications on Kubernetes in My Oracle Support Doc ID 2349228.1](https://support.oracle.com/epmos/faces/DocumentDisplay?_afrLoop=208317433106215&id=2349228.1&_afrWindowMode=0&_adf.ctrl-state=c2nhai8p3_4).
 
 ### Need more help? Have a suggestion? Come and say, "Hello!"
 
